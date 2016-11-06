@@ -13,6 +13,8 @@ public class TeleopTankMode extends OpMode {
 
     @Override
     public void init() {
+        telemetry.addData("Status", "Initialized");
+
         //get references to the motors from the hardware map
         leftMotor = hardwareMap.dcMotor.get("left_drive");
         rightMotor = hardwareMap.dcMotor.get("right_drive");
