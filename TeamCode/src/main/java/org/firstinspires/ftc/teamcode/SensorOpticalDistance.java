@@ -11,6 +11,7 @@ public class SensorOpticalDistance extends OpMode {
 
     DcMotor leftMotor;
     DcMotor rightMotor;
+    DcMotor winchMotor;
 
     OpticalDistanceSensor leftODS;
     OpticalDistanceSensor rightODS;
