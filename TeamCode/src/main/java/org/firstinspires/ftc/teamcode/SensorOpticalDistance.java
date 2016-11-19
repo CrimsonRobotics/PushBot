@@ -33,7 +33,7 @@ public class SensorOpticalDistance extends OpMode {
 
         leftMotor = hardwareMap.dcMotor.get("left_drive");
         rightMotor = hardwareMap.dcMotor.get("right_drive");
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         rightODS = hardwareMap.opticalDistanceSensor.get("sensor_right_ods");
         leftODS = hardwareMap.opticalDistanceSensor.get("sensor_left_ods");
