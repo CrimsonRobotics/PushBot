@@ -12,9 +12,10 @@ public class TeleopTankMode extends OpMode {
     DcMotor leftMotor;
     DcMotor rightMotor;
     DcMotor loaderMotor;
-
+    DcMotor shooterMotor;
 
     float loaderPower = 0;
+    float shooterPower = 0;
 
     @Override
     public void init() {
@@ -24,6 +25,7 @@ public class TeleopTankMode extends OpMode {
         leftMotor = hardwareMap.dcMotor.get("left_drive");
         rightMotor = hardwareMap.dcMotor.get("right_drive");
         loaderMotor = hardwareMap.dcMotor.get("loader");
+        shooterMotor = hardwareMap.dcMotor.get("shooter");
 
         //reverse the right motor
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -45,6 +47,12 @@ public class TeleopTankMode extends OpMode {
             loaderPower = 0;
         }
 
+        if (gamepad1.right_bumper){
+            shooterPower = 1;
+        }else{
+            shooterPower = 0;
+        }
+
 
 
 
@@ -52,6 +60,8 @@ public class TeleopTankMode extends OpMode {
         leftMotor.setPower(leftY);
         rightMotor.setPower(rightY);
         loaderMotor.setPower(loaderPower);
+        shooterMotor.setPower(shooterPower);
+
 
     }
 }
