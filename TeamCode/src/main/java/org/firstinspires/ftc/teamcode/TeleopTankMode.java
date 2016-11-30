@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
 
+
 @TeleOp(name = "TeleopTankMode", group = "Sensor")
 
 public class TeleopTankMode extends OpMode {
@@ -13,7 +14,7 @@ public class TeleopTankMode extends OpMode {
     DcMotor leftMotor;
     DcMotor rightMotor;
     //DcMotor loaderMotor;
-    //DcMotor shooterMotor;
+    DcMotor shooterMotor;
 
     DcMotor winchMotor;
 
@@ -34,10 +35,16 @@ public class TeleopTankMode extends OpMode {
     float shooterPower = 0;
 
 
-    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
 
 
+    final static int ENCODER_CPR = 1440;
+    final static double GEAR_RATIO = 1;
+    final static int WHEEL_DIAMETER = 1;
+    final static int DISTANCE = 5;
 
+    final static double CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
+    final static double ROTATIONS = DISTANCE / CIRCUMFERENCE;
+    static final double COUNTS = ENCODER_CPR * ROTATIONS * GEAR_RATIO;
 
 
 
@@ -50,8 +57,13 @@ public class TeleopTankMode extends OpMode {
         //get references to the motors from the hardware map
         leftMotor = hardwareMap.dcMotor.get("left_drive");
         rightMotor = hardwareMap.dcMotor.get("right_drive");
+
+        winchMotor = hardwareMap.dcMotor.get("winch");
+
+        winchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         //loaderMotor = hardwareMap.dcMotor.get("loader");
-        //shooterMotor = hardwareMap.dcMotor.get("shooter");
+        shooterMotor = hardwareMap.dcMotor.get("shooter");
 
         //upLeftServo = hardwareMap.servo.get("upLeftServo");
         //dnLeftServo = hardwareMap.servo.get("dnLeftServo");
@@ -62,12 +74,11 @@ public class TeleopTankMode extends OpMode {
         rightServo = hardwareMap.servo.get("rightServo");
         leftServo = hardwareMap.servo.get("leftServo");
 
-        //reverse the right motor
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftMotor.setDirection(DcMotor.Direction.REVERSE);
+        shooterMotor.setDirection(DcMotor.Direction.REVERSE);
 
 
 
-        //winchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         telemetry.addData("Status", "Resetting Winch Encoder");
         telemetry.update();
 
@@ -98,18 +109,33 @@ public class TeleopTankMode extends OpMode {
         }
 
 
-        /*if(gamepad1.y) {
+        if(gamepad1.y) {
+            telemetry.addData("Winch", "Up");
+            telemetry.update();
 
-
-            leftMotor.setTargetPosition(3);
+            winchMotor.setTargetPosition(66000);
 
             winchMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             winchMotor.setPower(.5);
 
 
 
-        }*/
+        }else if(gamepad1.a){
+            telemetry.addData("Winch", "Down");
+            telemetry.update();
 
+            winchMotor.setTargetPosition(0);
+
+            winchMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            winchMotor.setPower(.5);
+
+        }else if (gamepad1.left_trigger > 0.1){
+
+            winchMotor.setPower(0);
+        }
+
+        telemetry.addData("Winch", winchMotor.getCurrentPosition());
+        telemetry.update();
 
 
 
@@ -119,8 +145,8 @@ public class TeleopTankMode extends OpMode {
             //upRightServo.setPosition(openPosition);
             //dnLeftServo.setPosition(openPosition);
             //dnRightServo.setPosition(openPosition);
-            rightServo.setPosition(openPosition);
-            leftServo.setPosition(openPosition);
+            rightServo.setPosition(1);
+            leftServo.setPosition(0);
         }
         //Move servo 1 to the down position when a button is pressed
         if(gamepad1.b) {
@@ -128,15 +154,15 @@ public class TeleopTankMode extends OpMode {
             //upRightServo.setPosition(closePosition);
             //dnLeftServo.setPosition(closePosition);
             //dnRightServo.setPosition(closePosition);
-            rightServo.setPosition(closePosition);
-            leftServo.setPosition(closePosition);
+            rightServo.setPosition(0);
+            leftServo.setPosition(1);
         }
 
 
         leftMotor.setPower(leftY);
         rightMotor.setPower(rightY);
         //loaderMotor.setPower(loaderPower);
-        //shooterMotor.setPower(shooterPower);
+        shooterMotor.setPower(shooterPower);
 
 
     }

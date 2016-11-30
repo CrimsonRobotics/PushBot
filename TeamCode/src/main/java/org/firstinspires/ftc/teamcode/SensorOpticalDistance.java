@@ -25,6 +25,8 @@ public class SensorOpticalDistance extends OpMode {
     double leftP = 0;
     double rightP = 0;
 
+    int state = 1;
+
     String action = "";
 
     @Override
@@ -43,49 +45,55 @@ public class SensorOpticalDistance extends OpMode {
     @Override
     public void loop() {
 
-        // it should stop following the line once the color sensor detects either red or blue
 
-        rightLine = (rightODS.getLightDetected() > .5) ? true : false; // Check if line is underneath right sensor
-        leftLine = (leftODS.getLightDetected() > .5) ? true : false; // Check if line is underneath left sensor
+        if (state == 3) {
 
 
-        if (!leftLine && !rightLine && !prevLeftLine && !prevRightLine){ // No line
-            action = "Forward";
-            leftP = -1;
-            rightP = -1;
+            // it should stop following the line once the color sensor detects either red or blue
 
-        } else if (leftLine && !rightLine && !prevLeftLine && !prevRightLine){ // Entering line towards right
-            action = "Forward Right";
-            leftP = -1;
-            rightP = -0.05;
+            rightLine = (rightODS.getLightDetected() > .21); // Check if line is underneath right sensor
+            leftLine = (leftODS.getLightDetected() > .21); // Check if line is underneath left sensor
 
-        } else if (!leftLine && rightLine && !prevLeftLine && !prevRightLine){ // Entering line towards left
-            action = "Forward Left";
-            leftP = -0.05;
-            rightP = -1;
+            if (!leftLine && !rightLine && !prevLeftLine && !prevRightLine) { // No line
+                action = "Forward";
+                leftP = -1;
+                rightP = -1;
 
-        } else if (!leftLine && rightLine && prevLeftLine && prevRightLine){ // Leaving line towards right
-            action = "Back Right";
-            leftP = -1;
-            rightP = .05;
+            } else if (leftLine && !rightLine && !prevLeftLine && !prevRightLine) { // Entering line towards right
+                action = "Forward Right";
+                leftP = -1;
+                rightP = -0.05;
 
-        } else if (!leftLine && rightLine && prevLeftLine && prevRightLine){ // Leaving line towards left
-            action = "Back Left";
-            leftP = .05;
-            rightP = -1;
+            } else if (!leftLine && rightLine && !prevLeftLine && !prevRightLine) { // Entering line towards left
+                action = "Forward Left";
+                leftP = -0.05;
+                rightP = -1;
 
-        } else if (leftLine && rightLine && prevLeftLine && prevRightLine){ // On line
-            action = "Forward";
-            leftP = -1;
-            rightP = -1;
+            } else if (leftLine && !rightLine && prevLeftLine && prevRightLine) { // Leaving line towards right
+                action = "Back Right";
+                leftP = -1;
+                rightP = .05;
 
+            } else if (!leftLine && rightLine && prevLeftLine && prevRightLine) { // Leaving line towards left
+                action = "Back Left";
+                leftP = .05;
+                rightP = -1;
+
+            } else if (leftLine && rightLine && prevLeftLine && prevRightLine) { // On line
+                action = "Forward";
+                leftP = -1;
+                rightP = -1;
+
+            }
+
+
+            prevLeftLine = leftLine;
+            prevRightLine = rightLine;
         }
-
         leftMotor.setPower(leftP);
         rightMotor.setPower(rightP);
 
-        prevLeftLine = leftLine;
-        prevRightLine = rightLine;
+
 
         telemetry.addData("Right Raw",    rightODS.getRawLightDetected());
         telemetry.addData("Right Normal", rightODS.getLightDetected());
