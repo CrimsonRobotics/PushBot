@@ -25,7 +25,7 @@ public class SensorOpticalDistance extends OpMode {
     double leftP = 0;
     double rightP = 0;
 
-    int state = 1;
+    int state = 3;
 
     String action = "";
 
