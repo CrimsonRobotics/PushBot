@@ -135,7 +135,7 @@ public class TeleopTankMode extends OpMode {
         }
 
 
-        leftMotor.setPower(leftY); // Apply power variables
+        leftMotor.setPower(leftY); // Apply power variables to motors
         rightMotor.setPower(rightY);
         loaderMotor.setPower(loaderPower);
 
