@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
@@ -12,31 +10,18 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class TeleopTankMode extends OpMode {
 
-    DcMotor leftMotor;
+    DcMotor leftMotor;// Initialize variables to represent motors
     DcMotor rightMotor;
     DcMotor loaderMotor;
-    //DcMotor shooterMotor;
-
     DcMotor winchMotor;
 
-    Servo upLeftServo;
-    Servo dnLeftServo;
-    Servo upRightServo;
-    Servo dnRightServo;
-
-    Servo rightServo;
+    Servo rightServo;// Initialize variables to represent servos
     Servo leftServo;
-
     Servo rightButtonServo;
     Servo leftButtonServo;
 
-    double closePosition = 0.2;
-    double openPosition = 0.4;
-
-
-
+    // Initialize variables
     float loaderPower = 0;
-    //float shooterPower = 0;
 
     float leftY = 0;
     float rightY = 0;
@@ -46,52 +31,31 @@ public class TeleopTankMode extends OpMode {
 
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "Initializing");
         telemetry.update();
 
-        //get references to the motors from the hardware map
-        leftMotor = hardwareMap.dcMotor.get("left_drive");
+        leftMotor = hardwareMap.dcMotor.get("left_drive"); //Get references to the motors from the hardware map
         rightMotor = hardwareMap.dcMotor.get("right_drive");
-
         winchMotor = hardwareMap.dcMotor.get("winch");
-
-        winchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        //loaderMotor = hardwareMap.dcMotor.get("loader");
         loaderMotor = hardwareMap.dcMotor.get("shooter");
 
-        //upLeftServo = hardwareMap.servo.get("upLeftServo");
-        //dnLeftServo = hardwareMap.servo.get("dnLeftServo");
-        //upRightServo = hardwareMap.servo.get("upRightServo");
-        //dnRightServo = hardwareMap.servo.get("dnRightServo");
-
-
-        rightServo = hardwareMap.servo.get("rightServo");
+        rightServo = hardwareMap.servo.get("rightServo"); // Get references to the servos from the hardware map
         leftServo = hardwareMap.servo.get("leftServo");
-
         rightButtonServo = hardwareMap.servo.get("leftButtonServo");
         leftButtonServo = hardwareMap.servo.get("rightButtonServo");
 
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);
-        //loaderMotor.setDirection(DcMotor.Direction.REVERSE);
+        winchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);// Reset the encoder for the winch
 
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);// Reverse the right motor
 
-
-        telemetry.addData("Status", "Resetting Winch Encoder");
+        telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-        //winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // Send telemetry message to indicate successful Encoder reset
-        //telemetry.addData("Path0",  "Starting at %7d :%7d", winchMotor.getCurrentPosition());
-        telemetry.update();
-
     }
 
     @Override
     public void loop() {
 
-        if (gamepad1.right_stick_y != 0){
+        if (gamepad1.right_stick_y != 0){ // Allow triggers to determine the power of the drive motors
             leftY = -gamepad1.right_stick_y;
         }else{
             leftY = -gamepad2.right_stick_y;
@@ -102,41 +66,34 @@ public class TeleopTankMode extends OpMode {
             rightY = -gamepad2.left_stick_y;
         }
 
-
-        if ((gamepad1.left_trigger > .1 || gamepad2.left_trigger > .1) && !prevLeftTrigger){
+        if ((gamepad1.left_trigger > .1 || gamepad2.left_trigger > .1) && !prevLeftTrigger){ // Toggle variable only when the left trigger is pressed, not held
             loaderToggle = !loaderToggle;
         }
-
-        if (gamepad1.left_trigger > .1 || gamepad2.left_trigger > .1){
+        if (gamepad1.left_trigger > .1 || gamepad2.left_trigger > .1){ // Record previous position of the trigger
             prevLeftTrigger = true;
-        }else{
+        } else{
             prevLeftTrigger = false;
         }
 
-        if (!(gamepad1.left_trigger > .1 || gamepad2.left_trigger > .1) && !(gamepad1.right_trigger > .1 || gamepad2.right_trigger > .1)){
-            //loaderToggle = false;
-        }
-
-        if (gamepad1.right_trigger > .1 || gamepad2.right_trigger > .1){
+        if (gamepad1.right_trigger > .1 || gamepad2.right_trigger > .1){ // Reverse direction of loaderMotor only when the right trigger is held
             loaderMotor.setDirection(DcMotor.Direction.FORWARD);
-            //loaderPower = 1;
         }else{
             loaderMotor.setDirection(DcMotor.Direction.REVERSE);
         }
 
-        if (loaderToggle){
+        if (loaderToggle){ // Convert the boolean loaderToggle to the int loaderPower
             loaderPower = 1;
         }else{
             loaderPower = 0;
         }
 
 
-        if (gamepad1.right_bumper || gamepad2.right_bumper){
+        if (gamepad1.right_bumper || gamepad2.right_bumper){ // Extend right button pusher
             rightButtonServo.setPosition(1);
         }else{
             rightButtonServo.setPosition(0);
         }
-        if (gamepad1.left_bumper || gamepad2.left_bumper){
+        if (gamepad1.left_bumper || gamepad2.left_bumper){ // Extend left button pusher
             leftButtonServo.setPosition(0);
         }else{
             leftButtonServo.setPosition(1);
@@ -147,7 +104,7 @@ public class TeleopTankMode extends OpMode {
             telemetry.addData("Winch", "Up");
             telemetry.update();
 
-            winchMotor.setTargetPosition(66000);
+            winchMotor.setTargetPosition(66000); // Prepare winchMotor to about 46 times, because this encoder will send 1440 pulses per rotation
 
             winchMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             winchMotor.setPower(1);
@@ -156,32 +113,29 @@ public class TeleopTankMode extends OpMode {
             telemetry.addData("Winch", "Down");
             telemetry.update();
 
-            winchMotor.setTargetPosition(0);
+            winchMotor.setTargetPosition(0); // Prepare winchMotor to return to its initial position
 
             winchMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             winchMotor.setPower(.5);
 
         }else if (gamepad1.dpad_left || gamepad2.dpad_left){
-
-            winchMotor.setPower(0);
+            winchMotor.setPower(0); // Pause the movement of the winch
         }
 
         telemetry.addData("Winch", winchMotor.getCurrentPosition());
         telemetry.update();
 
 
-
-
-        if(gamepad1.x || gamepad2.x) {
+        if(gamepad1.x || gamepad2.x) { // Extend arms to grab the cap ball
             rightServo.setPosition(1);
             leftServo.setPosition(0);
-        }else if(gamepad1.b || gamepad2.b) {
+        }else if(gamepad1.b || gamepad2.b) { // Retract arms
             rightServo.setPosition(0);
             leftServo.setPosition(1);
         }
 
 
-        leftMotor.setPower(leftY);
+        leftMotor.setPower(leftY); // Apply power variables
         rightMotor.setPower(rightY);
         loaderMotor.setPower(loaderPower);
 
