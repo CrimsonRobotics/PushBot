@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -15,51 +11,32 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class LineFollowDark extends OpMode {
 
-    DcMotor leftMotor;
-    DcMotor rightMotor;
+    private DcMotor leftMotor;
+    private DcMotor rightMotor;
 
-    OpticalDistanceSensor leftODS;
-    OpticalDistanceSensor rightODS;
+    private OpticalDistanceSensor leftODS;
+    private OpticalDistanceSensor rightODS;
 
-    ColorSensor colorSensor;
+    private  ColorSensor colorSensor;
 
-    boolean leftLine;
-    boolean rightLine;
+    private Servo rightButtonServo;
+    private Servo leftButtonServo;
 
-    Servo rightButtonServo;
-    Servo leftButtonServo;
+    private boolean prevLeftLine = false;
+    private boolean prevRightLine = false;
 
-    Servo rightServo;
+    private double leftP = 0;
+    private double rightP = 0;
 
-    boolean prevLeftLine = false;
-    boolean prevRightLine = false;
+    private int state = 3;
 
-    double leftP = 0;
-    double rightP = 0;
+    private int beacon1 = 0;
+    private String action = "";
 
-    int state = 3;
+    private int turnRight = 0;
+    private int turnLeft = 0;
 
-    int beacon1 = 0;
-    String action = "";
-
-    int turnRight = 0;
-    int turnLeft = 0;
-
-    float angle = 90;// 0 is -->, 180 is <--
-    int xpos = 0;
-    int ypos = 0;
-
-    int prevLeftEncoder = 0;
-    int prevRightEncoder = 0;
-
-    int buttonTimer = 0;
-    int setTimer = 1;
-
-    int color = 3;
-
-    int beacon1done = 0;
-
-    Sensor gyro;
+    private int color = 3;
 
     @Override
     public void init() {
@@ -81,18 +58,6 @@ public class LineFollowDark extends OpMode {
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         colorSensor.enableLed(false);
-
-        //rightServo = hardwareMap.servo.get("rightServo");
-        //rightServo.setPosition(1);
-
-
-
-
-        SensorManager sensorManager;
-        sensorManager = (SensorManager)hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
-        gyro = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-
     }
 
     @Override
@@ -109,19 +74,15 @@ public class LineFollowDark extends OpMode {
             state = 4;
         }
 
-        if (state == 1){
+        if (state == 1){// Stops the robot
             leftP = 0;
             rightP = 0;
-        }else if (state == 2){
-
-
-
+        }else if (state == 2){// While in this state it will only use the color sensor
             telemetry.addData("Clear", colorSensor.alpha());
             telemetry.addData("Red  ", colorSensor.red());
             telemetry.addData("Green", colorSensor.green());
             telemetry.addData("Blue ", colorSensor.blue());
             telemetry.update();
-
 
             if (colorSensor.red() >= 3 && colorSensor.alpha() <= 2 && colorSensor.blue() < 2){ // If Color Sensor Detects Red
                 rightButtonServo.setPosition(1);// Extend Right Button Pusher
@@ -143,18 +104,18 @@ public class LineFollowDark extends OpMode {
 
 
 
-        }else if (state == 3 && beacon1 == 0) {
+        }else if (state == 3) {
             // it should stop following the line once the color sensor detects either red or blue
-            leftLine = (leftODS.getLightDetected() < .6); // Check if line is underneath left sensor
-            rightLine = (rightODS.getLightDetected() < .6); // Check if line is underneath right sensor
+            boolean leftLine = (leftODS.getLightDetected() < .6); // Check if line is underneath left sensor
+            boolean rightLine = (rightODS.getLightDetected() < .6); // Check if line is underneath right sensor
 
             if (!leftLine && !rightLine) { // No line
                 action = "Forward Off Line";
                 leftP = -.8;
                 rightP = -.8;
 
-                prevLeftLine = leftLine;
-                prevRightLine = rightLine;
+                prevLeftLine = false;
+                prevRightLine = false;
 
                 if (turnRight == 1){ // Find Line Again By Turning Right
                     action = "Find Line To The Right";
@@ -191,8 +152,8 @@ public class LineFollowDark extends OpMode {
                 turnRight = 0;
                 turnLeft = 0;
 
-                prevLeftLine = leftLine;
-                prevRightLine = rightLine;
+                prevLeftLine = true;
+                prevRightLine = true;
             }
 
             if (colorSensor.red() >= 3 && colorSensor.blue() < 2){ // If Color Sensor Detects Red
@@ -222,16 +183,11 @@ public class LineFollowDark extends OpMode {
                     beacon1 = 2000;
                 }
 
-
                 color = 1;
             }
             if (colorSensor.blue() < 2){
                 leftButtonServo.setPosition(1);
             }
-
-
-        }else if (state == 4){
-
 
 
         }
@@ -247,27 +203,12 @@ public class LineFollowDark extends OpMode {
 
         if (beacon1 >= 1860){
             beacon1 --;
-            beacon1done = 1;
         }
 
         if (beacon1 >= 1850 && beacon1 <= 1880){
-            //leftP = .3;
-            //rightP = .3;
             leftP = 0;
             rightP = 0;
         }
-        if (beacon1 >= 00 && beacon1 <= 100){
-            //leftP = -.7;
-            //rightP = .7;
-        }
-
-        int leftDifference = prevLeftEncoder - leftMotor.getCurrentPosition();
-        int rightDifference = prevRightEncoder - rightMotor.getCurrentPosition();
-
-
-
-        prevLeftEncoder = leftMotor.getCurrentPosition();
-        prevRightEncoder = rightMotor.getCurrentPosition();
 
         // Send info to Driver Station
         telemetry.addData("beacon1", beacon1);
