@@ -1,18 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.content.Context;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
-@TeleOp(name = "Light Line Follow", group = "Autonomous")
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
-public class SensorOpticalDistance extends OpMode {
+@TeleOp(name = "Dark Line Follow", group = "Autonomous")
+
+public class LineFollowDark extends OpMode {
 
     DcMotor leftMotor;
     DcMotor rightMotor;
@@ -144,8 +145,8 @@ public class SensorOpticalDistance extends OpMode {
 
         }else if (state == 3 && beacon1 == 0) {
             // it should stop following the line once the color sensor detects either red or blue
-            leftLine = (leftODS.getLightDetected() > .6); // Check if line is underneath left sensor
-            rightLine = (rightODS.getLightDetected() > .6); // Check if line is underneath right sensor
+            leftLine = (leftODS.getLightDetected() < .6); // Check if line is underneath left sensor
+            rightLine = (rightODS.getLightDetected() < .6); // Check if line is underneath right sensor
 
             if (!leftLine && !rightLine) { // No line
                 action = "Forward Off Line";
