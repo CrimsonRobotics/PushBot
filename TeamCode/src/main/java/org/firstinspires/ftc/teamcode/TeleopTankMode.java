@@ -34,7 +34,7 @@ public class TeleopTankMode extends OpMode {
         telemetry.addData("Status", "Initializing");
         telemetry.update();
 
-        leftMotor = hardwareMap.dcMotor.get("left_drive"); //Get references to the motors from the hardware map
+        leftMotor = hardwareMap.dcMotor.get("left_drive");// Get references to the motors from the hardware map
         rightMotor = hardwareMap.dcMotor.get("right_drive");
         winchMotor = hardwareMap.dcMotor.get("winch");
         loaderMotor = hardwareMap.dcMotor.get("shooter");
@@ -55,7 +55,7 @@ public class TeleopTankMode extends OpMode {
     @Override
     public void loop() {
 
-        if (gamepad1.right_stick_y != 0){ // Allow triggers to determine the power of the drive motors
+        if (gamepad1.right_stick_y != 0){ // Allow triggers to determine the power of the drive motors with gamepad1 overriding gamepad2
             leftY = -gamepad1.right_stick_y;
         }else{
             leftY = -gamepad2.right_stick_y;
@@ -104,7 +104,7 @@ public class TeleopTankMode extends OpMode {
             telemetry.addData("Winch", "Up");
             telemetry.update();
 
-            winchMotor.setTargetPosition(66000); // Prepare winchMotor to about 46 times, because this encoder will send 1440 pulses per rotation
+            winchMotor.setTargetPosition(66000); // Prepare winchMotor to rotate about 46 times, because this encoder will send 1440 pulses per rotation
 
             winchMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             winchMotor.setPower(1);
